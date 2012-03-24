@@ -142,6 +142,8 @@ class testApp : public ofBaseApp, public ofxMSAInteractiveObjectDelegate {
 	float videoInPercent;
 	float videoOutPercent;
 	
+	bool writePointcloud;
+	
 	bool drawPointcloud;
 	bool drawWireframe;
 	bool drawMesh;

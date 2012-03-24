@@ -50,13 +50,14 @@ void testApp::setup(){
 	temporalAlignmentMode = false;
 	captureFramePair = false;
 
+	writePointcloud = false;
 	sampleCamera = false;
 	
 	savingImage.setUseTexture(false);
 	savingImage.allocate(1920,1080, OF_IMAGE_COLOR);
 	
 	fboRectangle = ofRectangle(250, 100, 1280*.75, 720*.75);
-	fbo.allocate(1920, 1080, GL_RGB, 4);
+	fbo.allocate(1920, 1080, GL_RGBA, 4);
 		
 	newCompButton = new ofxMSAInteractiveObjectWithDelegate();
 	newCompButton->setLabel("New Comp");
@@ -108,10 +109,10 @@ void testApp::setup(){
 	gui.addPage("Batching");
 	gui.addToggle("View Comps", viewComps);
 	gui.addToggle("Render Batch", startRenderMode);
-
+	gui.addToggle("Write Pointclouds", writePointcloud);
 	gui.loadFromXML();
 	gui.toggleDraw();
-	
+
 	currentXScale = 1.0;
 	currentYScale = 1.0;
 	currentXAdditiveShift = 0;
@@ -307,7 +308,6 @@ void testApp::update(){
 		farClip = 5000;
 	}
 	
-	
 	if(currentLockCamera != cameraTrack.lockCameraToTrack){
 		if(!currentLockCamera){
 			cam.targetNode.setPosition(cam.getPosition());
@@ -356,16 +356,18 @@ void testApp::update(){
 		
 		startRenderMode = false;
 		currentlyRendering = true;
-		saveFolder = currentCompositionDirectory + "rendered"+pathDelim;
-		ofDirectory outputDirectory(saveFolder);
-		if(!outputDirectory.exists()) outputDirectory.create(true);
+		
+//		saveFolder = currentCompositionDirectory + "rendered"+pathDelim;
+//		ofDirectory outputDirectory(saveFolder);
+//		if(!outputDirectory.exists()) outputDirectory.create(true);
+		
 		hiResPlayer->play();
 		hiResPlayer->setSpeed(0);
 		hiResPlayer->setVolume(0);
 		
 		renderer.setRGBTexture(*hiResPlayer);
 		renderer.setTextureScale(1.0, 1.0);
-		//		currentSimplify = 1;
+
 		lastRenderFrame = currentRenderFrame-1;
 		numFramesToRender = timeline.getOutFrame() - timeline.getInFrame();
 		numFramesRendered = 0;
@@ -554,28 +556,52 @@ void testApp::draw(){
 
 			fbo.getTextureReference().draw(fboRectangle);
 			
+			
 			if(currentlyRendering){
-				fbo.getTextureReference().readToPixels(savingImage.getPixelsRef());
-				char filename[512];
-				sprintf(filename, "%s/save_%05d.png", saveFolder.c_str(), currentRenderFrame);
-				savingImage.saveImage(filename);
-				
-				//cout << "at save time its set to " << hiResPlayer->getCurrentFrame() << endl;
+				if(writePointcloud){
+					char filename[512];
+					sprintf(filename, "%s/cloud_%05d.cloud", saveFolder.c_str(), timeline.getCurrentFrame());				
+					
+					ofFile file(filename, ofFile::WriteOnly, true);
+					int numIndeces = renderer.getMesh().getIndices().size();
+					int numVerts = renderer.getMesh().getVertices().size();
+					int numTexcoords = renderer.getMesh().getTexCoords().size();
+					
+					file.write( (char*)&(numIndeces), sizeof(int) );
+					file.write( (char*)&(renderer.getMesh().getIndices())[0], sizeof(ofIndexType)*numIndeces );
+					
+					file.write( (char*)&(numVerts), sizeof(int) );
+					file.write( (char*)&(renderer.getMesh().getVertices()[0]).x, sizeof(ofVec3f)*numVerts );
+					
+					file.write( (char*)&(numTexcoords), sizeof(int) );
+					file.write( (char*)&(renderer.getMesh().getTexCoords()[0]).x, sizeof(ofVec2f)*numTexcoords );
+					
+					file.close();
+				}
+				else {
+					fbo.getTextureReference().readToPixels(savingImage.getPixelsRef());
+					char filename[512];
+					sprintf(filename, "%s/save_%05d.png", saveFolder.c_str(), currentRenderFrame);
+					savingImage.saveImage(filename);
+					
+					//cout << "at save time its set to " << hiResPlayer->getCurrentFrame() << endl;
 
-				///////frame debugging
-				//		numFramesRendered++;
-				//		cout << "	Rendered (" << numFramesRendered << "/" << numFramesToRender << ") +++ current render frame is " << currentRenderFrame << " quick time reports frame " << hiResPlayer->getCurrentFrame() << endl;
-				//		sprintf(filename, "%s/TEST_FRAME_%05d_%05d_B.png", saveFolder.c_str(), currentRenderFrame, hiResPlayer->getCurrentFrame());
-				//		savingImage.saveImage(filename);
-				//		savingImage.setFromPixels(hiResPlayer->getPixelsRef());
-				//		savingImage.saveImage(filename);
-				//////
-				
-				//stop when finished
+					///////frame debugging
+					//		numFramesRendered++;
+					//		cout << "	Rendered (" << numFramesRendered << "/" << numFramesToRender << ") +++ current render frame is " << currentRenderFrame << " quick time reports frame " << hiResPlayer->getCurrentFrame() << endl;
+					//		sprintf(filename, "%s/TEST_FRAME_%05d_%05d_B.png", saveFolder.c_str(), currentRenderFrame, hiResPlayer->getCurrentFrame());
+					//		savingImage.saveImage(filename);
+					//		savingImage.setFromPixels(hiResPlayer->getPixelsRef());
+					//		savingImage.saveImage(filename);
+					//////
+					
+					//stop when finished
+				}
 				currentRenderFrame++;
 				if(currentRenderFrame > timeline.getOutFrame()){
 					finishRender();
 				}
+				
 			}
 			
 			if(sampleCamera){
@@ -678,7 +704,7 @@ bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
 		}
 		
 		if(testFile.find("mov") != string::npos || testFile.find("MOV") != string::npos ){
-			if(testFile.find("small") == string::npos){
+			if(testFile.find("small") == string::npos && testFile.find("DnREs") == string::npos){
 				videoPath = dataDirectory.getPath(i);
 			}
 			else {
@@ -711,7 +737,7 @@ bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
 	if(pairingsFile == ""){
 		pairingsFile = ofFilePath::removeExt(smallVideoPath) + "_pairings.xml";
 	}
-	cout << "********** frameExtracted " << calibrationDirectory << endl;
+
 	if(!loadAlignmentMatrices(calibrationDirectory)){
 		ofSystemAlertDialog("Load Failed -- Couldn't Load Calibration Directory.");
 		return false;
@@ -736,6 +762,11 @@ bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
 	if(!compFolder.exists()){
 		compFolder.create(true);
 	}
+	
+	saveFolder = currentCompositionDirectory + "rendered"+pathDelim;
+	ofDirectory outputDirectory(saveFolder);
+	if(!outputDirectory.exists()) outputDirectory.create(true);
+	
 	return true;
 }
 

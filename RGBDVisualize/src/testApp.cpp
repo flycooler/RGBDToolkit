@@ -57,7 +57,7 @@ void testApp::setup(){
 	savingImage.allocate(1920,1080, OF_IMAGE_COLOR);
 	
 	fboRectangle = ofRectangle(250, 100, 1280*.75, 720*.75);
-	fbo.allocate(1920, 1080, GL_RGBA, 4);
+	fbo.allocate(1920, 1080, GL_RGB, 4);
 		
 	newCompButton = new ofxMSAInteractiveObjectWithDelegate();
 	newCompButton->setLabel("New Comp");

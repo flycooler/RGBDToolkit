@@ -545,8 +545,12 @@ void testApp::updateRenderer(ofVideoPlayer& fromPlayer){
 			currentDepthFrame = alignmentScrubber.getPairSequence().getDepthFrameForVideoFrame(fromPlayer.getCurrentFrame());
 			depthSequence.selectFrame(currentDepthFrame);
 		}
+		renderer.setDepthImage(depthPixelDecodeBuffer);
 	}
-	
+	else{
+		lowResPlayer->setFrame(videoTimelineElement.getSelectedFrame());
+		renderer.setDepthImage(depthSequence.currentDepthRaw);
+	}
 	
 	processDepthFrame();
 	

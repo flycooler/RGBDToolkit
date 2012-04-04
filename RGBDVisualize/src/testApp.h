@@ -173,5 +173,5 @@ class testApp : public ofBaseApp, public ofxMSAInteractiveObjectDelegate {
     
     ofImage jglTimeStretchedFrame;
     
-    vector<ofImage> videoFrameHistory;
+    vector<ofPixels> videoFrameHistory;
 };

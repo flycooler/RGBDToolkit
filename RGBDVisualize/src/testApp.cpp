@@ -126,28 +126,33 @@ void testApp::processDepthFrame(){
 	
     //copy the current frame of video out into the vector of history
     //make a new image
-    ofImage newVideoFrame;
+    ofPixels newVideoFrame;
     //allocate it
-    newVideoFrame.allocate(lowResPlayer->getWidth(), lowResPlayer->getHeight(), OF_IMAGE_COLOR);
+    //newVideoFrame.allocate(lowResPlayer->getWidth(), lowResPlayer->getHeight(), OF_IMAGE_COLOR);
     //copy the pixels from the video frame into the new image
-    newVideoFrame.setFromPixels(lowResPlayer->getPixelsRef());
+    newVideoFrame = lowResPlayer->getPixelsRef();
     //push the new image to the back of the vector
     videoFrameHistory.push_back(newVideoFrame);
 
     unsigned short maximumDistance = 4000;    
 	unsigned short minimumDistance =  400;
-	int mapMax = MIN(lengthOfHistory, videoFrameHistory.size());
 
+	int mapMax = MIN(lengthOfHistory, videoFrameHistory.size());
+	if(mapMax < 2){
+		return;
+	}
+	
 	for(int y = 0; y <	480; y++){
 		for(int x = 0; x < 640; x++){
 			int index = y*640+x;
             
             unsigned short rawPixelZ = depthPixelDecodeBuffer[index];
             float absoluteZValue = ofNormalize(rawPixelZ, minimumDistance, maximumDistance); //float / unsigned short conversiion
-            
+            absoluteZValue = ofClamp(absoluteZValue, 0, 1.0);
             int frameToGetColourValueFrom = (int)((float)mapMax*absoluteZValue);
-            ofColor pixelColourFromHistory = videoFrameHistory[frameToGetColourValueFrom].getPixelsRef().getColor(x,y);
-            
+			
+            ofColor pixelColourFromHistory = videoFrameHistory[frameToGetColourValueFrom].getColor(x,y);
+            //ofColor pixelColourFromHistory = ofColor(255, 0, 0, 255);
             jglTimeStretchedFrame.setColor(x, y, pixelColourFromHistory);
 			
 			//***************************************************
@@ -164,6 +169,8 @@ void testApp::processDepthFrame(){
 //			}
 		}
 	}
+	
+	jglTimeStretchedFrame.update();
 }
 
 void testApp::processGeometry(){
@@ -474,6 +481,8 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::updateRenderer(ofVideoPlayer& fromPlayer){
 	
+//	cout << "updating renderer" << endl;
+	
 	if (!temporalAlignmentMode) {
 		if(alignmentScrubber.getPairSequence().isSequenceTimebased()){
 			long movieMillis = fromPlayer.getPosition() * fromPlayer.getDuration()*1000;
@@ -484,6 +493,11 @@ void testApp::updateRenderer(ofVideoPlayer& fromPlayer){
 			currentDepthFrame = alignmentScrubber.getPairSequence().getDepthFrameForVideoFrame(fromPlayer.getCurrentFrame());
 			depthSequence.selectFrame(currentDepthFrame);
 		}
+		renderer.setDepthImage(depthPixelDecodeBuffer);
+	}
+	else{
+		lowResPlayer->setFrame(videoTimelineElement.getSelectedFrame());
+		renderer.setDepthImage(depthSequence.currentDepthRaw);
 	}
 	
 	

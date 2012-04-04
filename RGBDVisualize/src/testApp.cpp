@@ -123,7 +123,7 @@ void testApp::processDepthFrame(){
     if(videoFrameHistory.size() > lengthOfHistory){
         videoFrameHistory.erase(videoFrameHistory.begin());
     }
-    
+	
     //copy the current frame of video out into the vector of history
     //make a new image
     ofImage newVideoFrame;
@@ -133,17 +133,19 @@ void testApp::processDepthFrame(){
     newVideoFrame.setFromPixels(lowResPlayer->getPixelsRef());
     //push the new image to the back of the vector
     videoFrameHistory.push_back(newVideoFrame);
-	
-    unsigned short maximumDistance = 4000;
-    
+
+    unsigned short maximumDistance = 4000;    
+	unsigned short minimumDistance =  400;
+	int mapMax = MIN(lengthOfHistory, videoFrameHistory.size());
+
 	for(int y = 0; y <	480; y++){
 		for(int x = 0; x < 640; x++){
 			int index = y*640+x;
             
             unsigned short rawPixelZ = depthPixelDecodeBuffer[index];
-            float absoluteZValue = ofNormalize(rawPixelZ, 0, maximumDistance); //float / unsigned short conversiion
+            float absoluteZValue = ofNormalize(rawPixelZ, minimumDistance, maximumDistance); //float / unsigned short conversiion
             
-            int frameToGetColourValueFrom = (int)((float)lengthOfHistory*absoluteZValue);
+            int frameToGetColourValueFrom = (int)((float)mapMax*absoluteZValue);
             ofColor pixelColourFromHistory = videoFrameHistory[frameToGetColourValueFrom].getPixelsRef().getColor(x,y);
             
             jglTimeStretchedFrame.setColor(x, y, pixelColourFromHistory);

@@ -8,12 +8,6 @@ void testApp::setup(){
 	ofEnableAlphaBlending();
 	ofBackground(0);
 
-#ifdef TARGET_WIN32
-	pathDelim = "\\";
-#else
-	pathDelim = "/";
-#endif
-	
 	cam.speed = 40;
 	cam.autosavePosition = true;
 	cam.usemouse = true;
@@ -23,15 +17,6 @@ void testApp::setup(){
 	cam.targetNode.setScale(1,-1,1);
 	cameraTrack.setCamera(cam);
 	cam.loadCameraPosition();
-	
-	currentSimplify = 2;
-	lineSize = 1;
-	pointSize = 1;
-	
-	farClip = 5000;
-	videoInPercent = 0.0;
-	videoOutPercent = 1.0;
-	enableVideoInOut = false;
 	
 	hiResPlayer = NULL;
 	lowResPlayer = NULL;
@@ -56,7 +41,8 @@ void testApp::setup(){
 	savingImage.allocate(1920,1080, OF_IMAGE_COLOR);
 	
 	fboRectangle = ofRectangle(250, 100, 1280*.75, 720*.75);
-	fbo.allocate(1920, 1080, GL_RGB, 4);
+//	fbo.allocate(1920, 1080, GL_RGB, 4);
+	fbo.allocate(1920, 1080, GL_RGBA32F_ARB);
 		
 	newCompButton = new ofxMSAInteractiveObjectWithDelegate();
 	newCompButton->setLabel("New Comp");
@@ -68,6 +54,7 @@ void testApp::setup(){
 	saveCompButton->setDelegate(this);
 	saveCompButton->setPosAndSize(fboRectangle.x+fboRectangle.width+25, 25, 100, 25);
 
+	
 	timeline.setup();
 	timeline.setMovePlayheadOnDrag(true);
 	timeline.getColors().loadColors("defaultColors.xml");
@@ -157,9 +144,11 @@ void testApp::processGeometry(){
 	//*
 	//***************************************************
 
+
 //	for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
 //		renderer.getMesh().getVertices()[i].z += sin(i/30.0 + timeline.getCurrentFrame())*25;
 //	}
+	
 	
 }
 
@@ -172,31 +161,104 @@ void testApp::drawGeometry(){
 	//*
 	//***************************************************
 	
-	if(drawPointcloud){
-		ofPushStyle();
-		glPointSize(pointSize);
-		renderer.drawPointCloud();
-		ofPopStyle();
-	}
-	
-	if(drawWireframe){
-		ofPushStyle();
-		glLineWidth(lineSize);
-		renderer.drawWireFrame();
-		ofPopStyle();
-	}
-	
-	if(drawMesh){
-		ofPushStyle();
-		renderer.drawMesh();
-		ofPopStyle();
-	}	
-
-//	for(int i = 0; i < 200; i++){
-//		ofNode n;
-//		n.setPosition(ofVec3f(ofRandom(-200,200),ofRandom(-200,200),ofRandom(-200,200)));
-//		n.draw();
+//	if(drawPointcloud){
+//		glPointSize(pointSize);
+//		renderer.drawPointCloud();
 //	}
+//	
+//	if(drawWireframe){
+//		glLineWidth(lineSize);
+//		renderer.drawWireFrame();
+//	}
+//	
+//	if(drawMesh){
+//		renderer.drawMesh();
+//	}
+	ofVec3f oldLine;
+	
+	for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
+//		if(ofRandomuf() > .6){//only 4/10 vertex gets a circle
+			ofPushStyle();
+			ofVec2f colorIndex = renderer.getMesh().getTexCoord(i);
+			if(colorIndex.x < lowResPlayer->getWidth() && colorIndex.y < lowResPlayer->getHeight()){
+				ofColor c = lowResPlayer->getPixelsRef().getColor(colorIndex.x, colorIndex.y);
+				if (c.r < 70) continue;
+				int f = timeline.getCurrentFrame();
+				// initial, just point cloud
+				if (f < 1800) {
+					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
+					pointInSpace.y *= -1;
+					ofSetColor(c);
+					ofBox(pointInSpace, 2);
+					ofPopStyle();
+				} else if (f >= 1800 && f < 2100) {
+					if (c.r > 100) {
+						c.r = (c.r + f)%255;
+						c.g = (c.g + f*2)%255;
+						c.b = (c.b + f*3)%255;
+						ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
+						pointInSpace.y *= -1;
+						ofSetColor(c);
+						ofBox(pointInSpace, 2);
+						ofPopStyle();
+					}
+				} else if (f >= 2100 && f < 2400) {
+					c.r = (c.r + f)%255;
+					c.g = (c.g + f*2)%255;
+					c.b = (c.b + f*3)%255;
+					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
+					pointInSpace.y *= -1;
+					ofSetColor(c);
+					ofBox(pointInSpace, 2 - (f-2100)/150);
+					glLineWidth((f-2100)/100);
+					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
+						ofLine(oldLine, pointInSpace);
+					ofPopStyle();
+					oldLine = pointInSpace;
+				} else if (f >= 2400 && f < 2700) {
+					c.r = (c.r + f)%255;
+					c.g = (c.g + f*2)%255;
+					c.b = (c.b + f*3)%255;
+					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
+					pointInSpace.y *= -1;
+					ofSetColor(c);
+					glLineWidth(3);
+					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
+						ofLine(oldLine, pointInSpace);
+					ofPopStyle();
+					oldLine = pointInSpace;
+				} else if (f >= 2700 && f < 3000) {
+					c.r = (c.r + f)%255;
+					c.g = (c.g + f*2)%255;
+					c.b = (c.b + f*3)%255;
+					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
+					pointInSpace.y *= -1;
+					ofSetColor(c);
+					glLineWidth(3);
+					pointInSpace.z += c.b%3;
+					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
+						ofLine(oldLine, pointInSpace);
+					ofPopStyle();
+					oldLine = pointInSpace;
+				} else {
+					c.r = (c.r + timeline.getCurrentFrame())%255 * fmax(ofRandomuf(),.4);
+					c.g = (c.g + timeline.getCurrentFrame()*2)%255 * fmax(ofRandomuf(),.4);
+					c.b = (c.b + timeline.getCurrentFrame()*3)%255 * fmax(ofRandomuf(),.4);
+					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
+					pointInSpace.y *= -1;
+					ofSetColor(c);
+					glLineWidth(3);
+					
+					pointInSpace.z += c.b%5;
+					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
+						ofLine(oldLine, pointInSpace);
+					
+					oldLine = pointInSpace;
+					ofPopStyle();
+				}
+			}
+//		}
+	}
 }
 
 //************************************************************
@@ -298,16 +360,6 @@ void testApp::update(){
 	
 	if(!allLoaded) return;
 	
-	//if we don't have good pairings, force pages on timeline + gui
-	if(!alignmentScrubber.ready()){
-		videoTimelineElement.setInFrame(0);
-		videoTimelineElement.setOutFrame(lowResPlayer->getTotalNumFrames());
-		gui.setPage(3);
-		timeline.setCurrentPage(1);
-		farClip = 5000;
-	}
-	
-	
 	if(currentLockCamera != cameraTrack.lockCameraToTrack){
 		if(!currentLockCamera){
 			cam.targetNode.setPosition(cam.getPosition());
@@ -356,7 +408,7 @@ void testApp::update(){
 		
 		startRenderMode = false;
 		currentlyRendering = true;
-		saveFolder = currentCompositionDirectory + "rendered"+pathDelim;
+		saveFolder = currentCompositionDirectory + "rendered/";
 		ofDirectory outputDirectory(saveFolder);
 		if(!outputDirectory.exists()) outputDirectory.create(true);
 		hiResPlayer->play();
@@ -401,11 +453,11 @@ void testApp::update(){
 	
 	if(!currentlyRendering){
 		lowResPlayer->update();	
-		if(!temporalAlignmentMode && lowResPlayer->isFrameNew()){
+		if(!temporalAlignmentMode && lowResPlayer->isFrameNew()){		
 			updateRenderer(*lowResPlayer);
 		}
-		//cout << "timeline is " << videoTimelineElement.getSelectedFrame() << " and player is " << lowResPlayer->getCurrentFrame() << endl;; 
-		if(temporalAlignmentMode && (currentDepthFrame != depthSequence.getSelectedFrame())){
+		
+		if(temporalAlignmentMode && currentDepthFrame != depthSequence.getSelectedFrame()){
 			updateRenderer(*lowResPlayer);
 		}
 		
@@ -423,7 +475,7 @@ void testApp::update(){
 	if(shouldClearCameraMoves){
 		cameraTrack.getCameraTrack().reset();
 		shouldClearCameraMoves = false;
-	}	
+	}
 	
 	if(shouldSaveCameraPoint){
 		//cameraRecorder.sample(lowResPlayer->getCurrentFrame());
@@ -465,7 +517,6 @@ void testApp::update(){
 		renderer.setSimplification(currentSimplify);
 		renderer.farClip = farClip;
 		renderer.mirror = currentMirror;
-		
 		renderer.update();
 	}
 	
@@ -490,15 +541,13 @@ void testApp::updateRenderer(ofVideoPlayer& fromPlayer){
 			currentDepthFrame = alignmentScrubber.getPairSequence().getDepthFrameForVideoFrame(fromPlayer.getCurrentFrame());
 			depthSequence.selectFrame(currentDepthFrame);
 		}
-		renderer.setDepthImage(depthPixelDecodeBuffer);
 	}
-	else{
-		lowResPlayer->setFrame(videoTimelineElement.getSelectedFrame());
-		renderer.setDepthImage(depthSequence.currentDepthRaw);
-	}
-
+	
+	
 	processDepthFrame();
+	
 	renderer.update();
+	
 	processGeometry();
 	
 	if(!drawPointcloud && !drawWireframe && !drawMesh){
@@ -519,13 +568,18 @@ void testApp::draw(){
 		
 		if(!viewComps){
 			fbo.begin();
-			ofClear(0, 0, 0);
+//			ofClear(0, 0, 0);
+			ofSetColor(0,20);
+			ofRect(0,0,fbo.getWidth(), fbo.getHeight());
+			ofSetColor(255);
 			
 			cam.begin(ofRectangle(0, 0, fbo.getWidth(), fbo.getHeight()));
+			
 			
 			drawGeometry();
 			
 			cam.end();
+			
 			
 			fbo.end();	
 			
@@ -609,6 +663,7 @@ void testApp::draw(){
 		}
 		ofPopStyle();
 	}
+	
 }
 
 
@@ -625,14 +680,14 @@ bool testApp::loadNewProject(){
 		
 	string currentMediaFolder = r.getPath();	
 	
-	ofDirectory compBin(currentMediaFolder + pathDelim + "compositions"+pathDelim);
+	ofDirectory compBin(currentMediaFolder + "/compositions/");
 	if(!compBin.exists()){
 		compBin.create(true);
 	}	
 	compBin.listDir();
 	
 	int compNumber = compBin.numFiles();
-	currentCompositionDirectory = currentMediaFolder + pathDelim+"compositions"+pathDelim+"comp" + ofToString(compNumber) + pathDelim;
+	currentCompositionDirectory = currentMediaFolder + "/compositions/comp" + ofToString(compNumber) + "/";
 	currentCompIndex = compNumber;
 	
 	if(!loadAssetsFromCompositionDirectory(currentMediaFolder)){
@@ -648,7 +703,7 @@ bool testApp::loadNewProject(){
 }
 
 bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
-//	cout << "loading media folder " << currentMediaFolder << endl;
+	cout << "loading media folder " << currentMediaFolder << endl;
 	
 	if(!playerElementAdded){
 		populateTimelineElements();
@@ -665,19 +720,20 @@ bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
 	string videoPath = "";
 	string smallVideoPath = "";
 	string depthImageDirectory = "";
-	pairingsFile = "";
+	string pairingsFile = "";
 	
 	for(int i = 0; i < numFiles; i++){
+		cout << "testin file " << dataDirectory.getName(i) << endl;
 		string testFile = dataDirectory.getName(i);
 		if(testFile.find("calibration") != string::npos){
 			calibrationDirectory = dataDirectory.getPath(i);
 		}
 		
-		if(testFile.find("depth") != string::npos || testFile.find("TAKE") != string::npos){
+		if(testFile.find("depth") != string::npos){
 			depthImageDirectory = dataDirectory.getPath(i);
 		}
 		
-		if(testFile.find("mov") != string::npos || testFile.find("MOV") != string::npos ){
+		if(testFile.find("mov") != string::npos){
 			if(testFile.find("small") == string::npos){
 				videoPath = dataDirectory.getPath(i);
 			}
@@ -709,11 +765,11 @@ bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
 	
 	
 	if(pairingsFile == ""){
-		pairingsFile = ofFilePath::removeExt(smallVideoPath) + "_pairings.xml";
+		pairingsFile = currentCompositionDirectory + ofFilePath::removeExt(smallVideoPath) + "pairings.xml";
 	}
-	cout << "********** frameExtracted " << calibrationDirectory << endl;
+	
 	if(!loadAlignmentMatrices(calibrationDirectory)){
-		ofSystemAlertDialog("Load Failed -- Couldn't Load Calibration Directory.");
+		ofSystemAlertDialog("Load Failed -- Couldn't Load Calibration Direcotry.");
 		return false;
 	}
 	
@@ -723,7 +779,7 @@ bool testApp::loadAssetsFromCompositionDirectory(string currentMediaFolder) {
 	}
 	
 	if(!loadDepthSequence(depthImageDirectory)){
-		ofSystemAlertDialog("Load Failed -- Couldn't load depth iamges.");
+		ofSystemAlertDialog("Load Failed -- Couldn't load dpeth iamges.");
 		return false;
 	}
 	
@@ -746,7 +802,7 @@ bool testApp::loadDepthSequence(string path){
 	
 	depthPixelDecodeBuffer = depthSequence.currentDepthRaw;
 	renderer.setDepthImage(depthPixelDecodeBuffer);
-	
+
 	return depthSequence.loadSequence(path);
 }
 
@@ -777,6 +833,7 @@ bool testApp::loadVideoFile(string hiResPath, string lowResPath){
 		return false;		
 	}
 	
+	
 	if(hasHiresVideo){
 		renderer.setTextureScale(1.0*lowResPlayer->getWidth()/hiResPlayer->getWidth(), 
 								 1.0*lowResPlayer->getHeight()/hiResPlayer->getHeight());
@@ -785,7 +842,7 @@ bool testApp::loadVideoFile(string hiResPath, string lowResPath){
 
 		float fullsizedWidth  = renderer.getRGBCalibration().getDistortedIntrinsics().getImageSize().width;
 		float fullsizedHeight = renderer.getRGBCalibration().getDistortedIntrinsics().getImageSize().height; 
-//		cout << "image size is " << fullsizedWidth << " " << fullsizedHeight << endl;
+		cout << "image size is " << fullsizedWidth << " " << fullsizedHeight << endl;
 		renderer.setTextureScale(1.0*lowResPlayer->getWidth()/fullsizedWidth, 
 								 1.0*lowResPlayer->getHeight()/fullsizedHeight);
 	}
@@ -796,9 +853,7 @@ bool testApp::loadVideoFile(string hiResPath, string lowResPath){
 		ofDirectory(videoThumbsPath).create(true);
 	}
 	videoTimelineElement.setup();	
-	if(!enableVideoInOut){
-		timeline.setDurationInFrames(lowResPlayer->getTotalNumFrames());
-	}
+//	timeline.setDurationInFrames(lowResPlayer->getTotalNumFrames());
 	videoTimelineElement.setVideoPlayer(*lowResPlayer, videoThumbsPath);
 	lowResPlayer->play();
 	lowResPlayer->setSpeed(0);
@@ -847,7 +902,7 @@ bool testApp::loadAlignmentMatrices(string path){
 
 //--------------------------------------------------------------
 void testApp::loadCompositions(){
-	ofSystemAlertDialog("Select the MediaBin");
+	ofSystemAlertDialog("Select the MediaBin containing everyone's names");
 
 	ofFileDialogResult r = ofSystemLoadDialog("Select Media Bin", true);
 	if(r.bSuccess){
@@ -866,7 +921,7 @@ void testApp::refreshCompButtons(){
 	int compy = 150;
 	for(int i = 0; i < mediaFolders; i++){
 		
-		string compositionsFolder = dir.getPath(i) + pathDelim +"compositions"+pathDelim;
+		string compositionsFolder = dir.getPath(i) + "/compositions/";
 		ofDirectory compositionsDirectory(compositionsFolder);
 		if(!compositionsDirectory.exists()){
 			compositionsDirectory.create(true);
@@ -903,9 +958,8 @@ void testApp::refreshCompButtons(){
 				compx += 325;
 			}
 			
-
 			comp->fullCompPath = compositionsDirectory.getPath(c);
-			vector<string> compSplit = ofSplitString(comp->fullCompPath, pathDelim, true, true);
+			vector<string> compSplit = ofSplitString(comp->fullCompPath, "/", true, true);
 			string compLabel = compSplit[compSplit.size()-3] + ":" + compSplit[compSplit.size()-1];
 			
 			comp->load->setLabel(compLabel);
@@ -990,16 +1044,17 @@ void testApp::objectDidRelease(ofxMSAInteractiveObject* object, int x, int y, in
 		}
 	}
 }
-			
+
+
 //--------------------------------------------------------------
 bool testApp::loadCompositionAtIndex(int i){
 //	stopCameraPlayback();
 	stopCameraRecord();
-	
-	currentCompositionDirectory = comps[i]->fullCompPath + pathDelim;
+
+	currentCompositionDirectory = comps[i]->fullCompPath + "/";
 	currentCompIndex = i;
 
-	allLoaded = loadAssetsFromCompositionDirectory( currentCompositionDirectory+".."+pathDelim+".."+pathDelim );
+	allLoaded = loadAssetsFromCompositionDirectory( currentCompositionDirectory+"../../");
 
 	if(!allLoaded){
 		return false;
@@ -1030,13 +1085,6 @@ bool testApp::loadCompositionAtIndex(int i){
 	videoOutPercent = projectsettings.getValue("videoout", 1.);
 	renderer.rotateMeshX = projectsettings.getValue("xrot", 0);
 	
-	//error condition for corrupted comps
-	if(currentDuration <= 0){
-		currentDuration = lowResPlayer->getTotalNumFrames();
-	}
-	if(farClip <= 0){
-		farClip = 5000;
-	}
 	shouldResetDuration = true;
 	
 	//set keyframer files based on comp

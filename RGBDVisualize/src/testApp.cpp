@@ -41,8 +41,7 @@ void testApp::setup(){
 	savingImage.allocate(1920,1080, OF_IMAGE_COLOR);
 	
 	fboRectangle = ofRectangle(250, 100, 1280*.75, 720*.75);
-//	fbo.allocate(1920, 1080, GL_RGB, 4);
-	fbo.allocate(1920, 1080, GL_RGBA32F_ARB);
+	fbo.allocate(1920, 1080, GL_RGB, 4);
 		
 	newCompButton = new ofxMSAInteractiveObjectWithDelegate();
 	newCompButton->setLabel("New Comp");
@@ -110,18 +109,47 @@ void testApp::setup(){
 	
 	currentLockCamera = false;
 	cameraTrack.lockCameraToTrack = false;
+    
+    jglTimeStretchedFrame.allocate(640,480, OF_IMAGE_COLOR); //adding an image here, guessing to be the correct size...
+    renderer.setRGBTexture(jglTimeStretchedFrame); //setting it to be the RGB texture
 }
 
 #pragma mark customization
 //--------------------------------------------------------------
 void testApp::processDepthFrame(){
+    
+    int lengthOfHistory = 20;
+    
+    if(videoFrameHistory.size() > lengthOfHistory){
+        videoFrameHistory.erase(videoFrameHistory.begin());
+    }
+    
+    //copy the current frame of video out into the vector of history
+    //make a new image
+    ofImage newVideoFrame;
+    //allocate it
+    newVideoFrame.allocate(lowResPlayer->getWidth(), lowResPlayer->getHeight(), OF_IMAGE_COLOR);
+    //copy the pixels from the video frame into the new image
+    newVideoFrame.setFromPixels(lowResPlayer->getPixelsRef());
+    //push the new image to the back of the vector
+    videoFrameHistory.push_back(newVideoFrame);
 	
+    unsigned short maximumDistance = 4000;
+    
 	for(int y = 0; y <	480; y++){
 		for(int x = 0; x < 640; x++){
 			int index = y*640+x;
+            
+            unsigned short rawPixelZ = depthPixelDecodeBuffer[index];
+            float absoluteZValue = ofNormalize(rawPixelZ, 0, maximumDistance); //float / unsigned short conversiion
+            
+            int frameToGetColourValueFrom = (int)((float)lengthOfHistory*absoluteZValue);
+            ofColor pixelColourFromHistory = videoFrameHistory[frameToGetColourValueFrom].getPixelsRef().getColor(x,y);
+            
+            jglTimeStretchedFrame.setColor(x, y, pixelColourFromHistory);
 			
 			//***************************************************
-			//CUSTOMIZATION: YOU CAN PROCESS YOU	R RAW DEPTH FRAME HERE
+			//CUSTOMIZATION: YOU CAN PROCESS YOUR RAW DEPTH FRAME HERE
 			//* 
 			//* depthPixelDecodeBuffer contains the raw depth image
 			//*
@@ -144,11 +172,9 @@ void testApp::processGeometry(){
 	//*
 	//***************************************************
 
-
 //	for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
 //		renderer.getMesh().getVertices()[i].z += sin(i/30.0 + timeline.getCurrentFrame())*25;
 //	}
-	
 	
 }
 
@@ -161,104 +187,19 @@ void testApp::drawGeometry(){
 	//*
 	//***************************************************
 	
-//	if(drawPointcloud){
-//		glPointSize(pointSize);
-//		renderer.drawPointCloud();
-//	}
-//	
-//	if(drawWireframe){
-//		glLineWidth(lineSize);
-//		renderer.drawWireFrame();
-//	}
-//	
-//	if(drawMesh){
-//		renderer.drawMesh();
-//	}
-	ofVec3f oldLine;
-	
-	for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
-//		if(ofRandomuf() > .6){//only 4/10 vertex gets a circle
-			ofPushStyle();
-			ofVec2f colorIndex = renderer.getMesh().getTexCoord(i);
-			if(colorIndex.x < lowResPlayer->getWidth() && colorIndex.y < lowResPlayer->getHeight()){
-				ofColor c = lowResPlayer->getPixelsRef().getColor(colorIndex.x, colorIndex.y);
-				if (c.r < 70) continue;
-				int f = timeline.getCurrentFrame();
-				// initial, just point cloud
-				if (f < 1800) {
-					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
-					pointInSpace.y *= -1;
-					ofSetColor(c);
-					ofBox(pointInSpace, 2);
-					ofPopStyle();
-				} else if (f >= 1800 && f < 2100) {
-					if (c.r > 100) {
-						c.r = (c.r + f)%255;
-						c.g = (c.g + f*2)%255;
-						c.b = (c.b + f*3)%255;
-						ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
-						pointInSpace.y *= -1;
-						ofSetColor(c);
-						ofBox(pointInSpace, 2);
-						ofPopStyle();
-					}
-				} else if (f >= 2100 && f < 2400) {
-					c.r = (c.r + f)%255;
-					c.g = (c.g + f*2)%255;
-					c.b = (c.b + f*3)%255;
-					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
-					pointInSpace.y *= -1;
-					ofSetColor(c);
-					ofBox(pointInSpace, 2 - (f-2100)/150);
-					glLineWidth((f-2100)/100);
-					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
-						ofLine(oldLine, pointInSpace);
-					ofPopStyle();
-					oldLine = pointInSpace;
-				} else if (f >= 2400 && f < 2700) {
-					c.r = (c.r + f)%255;
-					c.g = (c.g + f*2)%255;
-					c.b = (c.b + f*3)%255;
-					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
-					pointInSpace.y *= -1;
-					ofSetColor(c);
-					glLineWidth(3);
-					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
-						ofLine(oldLine, pointInSpace);
-					ofPopStyle();
-					oldLine = pointInSpace;
-				} else if (f >= 2700 && f < 3000) {
-					c.r = (c.r + f)%255;
-					c.g = (c.g + f*2)%255;
-					c.b = (c.b + f*3)%255;
-					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
-					pointInSpace.y *= -1;
-					ofSetColor(c);
-					glLineWidth(3);
-					pointInSpace.z += c.b%3;
-					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
-						ofLine(oldLine, pointInSpace);
-					ofPopStyle();
-					oldLine = pointInSpace;
-				} else {
-					c.r = (c.r + timeline.getCurrentFrame())%255 * fmax(ofRandomuf(),.4);
-					c.g = (c.g + timeline.getCurrentFrame()*2)%255 * fmax(ofRandomuf(),.4);
-					c.b = (c.b + timeline.getCurrentFrame()*3)%255 * fmax(ofRandomuf(),.4);
-					ofVec3f pointInSpace = renderer.getMesh().getVertex(i);
-					pointInSpace.y *= -1;
-					ofSetColor(c);
-					glLineWidth(3);
-					
-					pointInSpace.z += c.b%5;
-					if (sqrt(pow((oldLine.x - pointInSpace.x),2) + pow((oldLine.y - pointInSpace.y),2)) < 50)
-						ofLine(oldLine, pointInSpace);
-					
-					oldLine = pointInSpace;
-					ofPopStyle();
-				}
-			}
-//		}
+	if(drawPointcloud){
+		glPointSize(pointSize);
+		renderer.drawPointCloud();
 	}
+	
+	if(drawWireframe){
+		glLineWidth(lineSize);
+		renderer.drawWireFrame();
+	}
+	
+	if(drawMesh){
+		renderer.drawMesh();
+	}	
 }
 
 //************************************************************
@@ -568,18 +509,13 @@ void testApp::draw(){
 		
 		if(!viewComps){
 			fbo.begin();
-//			ofClear(0, 0, 0);
-			ofSetColor(0,20);
-			ofRect(0,0,fbo.getWidth(), fbo.getHeight());
-			ofSetColor(255);
+			ofClear(0, 0, 0);
 			
 			cam.begin(ofRectangle(0, 0, fbo.getWidth(), fbo.getHeight()));
-			
 			
 			drawGeometry();
 			
 			cam.end();
-			
 			
 			fbo.end();	
 			
@@ -847,7 +783,9 @@ bool testApp::loadVideoFile(string hiResPath, string lowResPath){
 								 1.0*lowResPlayer->getHeight()/fullsizedHeight);
 	}
 	
-	renderer.setRGBTexture(*lowResPlayer);
+	//renderer.setRGBTexture(*lowResPlayer);
+    renderer.setRGBTexture(jglTimeStretchedFrame);
+    
 	string videoThumbsPath = ofFilePath::removeExt(lowResPath);
 	if(!ofDirectory(videoThumbsPath).exists()){
 		ofDirectory(videoThumbsPath).create(true);

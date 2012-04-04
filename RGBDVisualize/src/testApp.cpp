@@ -38,12 +38,15 @@ void testApp::setup(){
 	sampleCamera = false;
 	
 	savingImage.setUseTexture(false);
-	savingImage.allocate(1920,1080, OF_IMAGE_COLOR);
+	savingImage.allocate(1920, 1080, OF_IMAGE_COLOR);
 	
 	fboRectangle = ofRectangle(250, 100, 1280*.75, 720*.75);
 //	fbo.allocate(1920, 1080, GL_RGB, 4);
 	fbo.allocate(1920, 1080, GL_RGBA32F_ARB);
-		
+	fbo.begin();
+	ofClear(0, 0, 0, 0);
+	fbo.end();
+	
 	newCompButton = new ofxMSAInteractiveObjectWithDelegate();
 	newCompButton->setLabel("New Comp");
 	newCompButton->setDelegate(this);
@@ -177,6 +180,7 @@ void testApp::drawGeometry(){
 	ofVec3f oldLine;
 	
 	for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
+		   
 //		if(ofRandomuf() > .6){//only 4/10 vertex gets a circle
 			ofPushStyle();
 			ofVec2f colorIndex = renderer.getMesh().getTexCoord(i);
@@ -568,13 +572,12 @@ void testApp::draw(){
 		
 		if(!viewComps){
 			fbo.begin();
-//			ofClear(0, 0, 0);
+
 			ofSetColor(0,20);
 			ofRect(0,0,fbo.getWidth(), fbo.getHeight());
 			ofSetColor(255);
 			
 			cam.begin(ofRectangle(0, 0, fbo.getWidth(), fbo.getHeight()));
-			
 			
 			drawGeometry();
 			
@@ -606,6 +609,11 @@ void testApp::draw(){
 				ofDrawBitmapString(currentCompositionDirectory, ofPoint(fboRectangle.x, fboRectangle.y-15));
 			}
 
+			ofPushStyle();
+			ofSetColor(0);
+			ofRect(fboRectangle);
+			ofPopStyle();
+			
 			fbo.getTextureReference().draw(fboRectangle);
 			
 			if(currentlyRendering){

@@ -395,10 +395,10 @@ void testApp::update(){
 		videoTimelineElement.setOutFrame(lowResPlayer->getTotalNumFrames());		
 	}
 	
-	if(startRenderMode && !hasHiresVideo){
-		ofSystemAlertDialog("This composition doesn't have a hi res movie so we can't render!");
-		startRenderMode = false;
-	}
+//	if(startRenderMode && !hasHiresVideo){
+//		ofSystemAlertDialog("This composition doesn't have a hi res movie so we can't render!");
+//		startRenderMode = false;
+//	}
 	
 	if(startRenderMode){
 		viewComps = false;
@@ -415,12 +415,13 @@ void testApp::update(){
 		saveFolder = currentCompositionDirectory + "rendered/";
 		ofDirectory outputDirectory(saveFolder);
 		if(!outputDirectory.exists()) outputDirectory.create(true);
-		hiResPlayer->play();
-		hiResPlayer->setSpeed(0);
-		hiResPlayer->setVolume(0);
-		
-		renderer.setRGBTexture(*hiResPlayer);
-		renderer.setTextureScale(1.0, 1.0);
+		if(hasHiresVideo){
+			hiResPlayer->play();
+			hiResPlayer->setSpeed(0);
+			hiResPlayer->setVolume(0);
+			renderer.setRGBTexture(*hiResPlayer);
+			renderer.setTextureScale(1.0, 1.0);
+		}
 		//		currentSimplify = 1;
 		lastRenderFrame = currentRenderFrame-1;
 		numFramesToRender = timeline.getOutFrame() - timeline.getInFrame();
@@ -434,8 +435,14 @@ void testApp::update(){
 		//hiResPlayer->setFrame(currentRenderFrame % hiResPlayer->getTotalNumFrames());
 		timeline.setCurrentFrame(currentRenderFrame);
 		videoTimelineElement.selectFrame(currentRenderFrame);		
-		hiResPlayer->setFrame(videoTimelineElement.selectFrame(currentRenderFrame));
-		hiResPlayer->update();
+		if(hasHiresVideo){
+			hiResPlayer->setFrame(videoTimelineElement.selectFrame(currentRenderFrame));
+			hiResPlayer->update();
+		}
+		else {
+			lowResPlayer->setFrame(videoTimelineElement.selectFrame(currentRenderFrame));
+			lowResPlayer->update();		
+		}
 		
 //		cout << "would have set hi res frame to " << currentRenderFrame % hiResPlayer->getTotalNumFrames() << endl;
 //		cout << "instead set it to " << hiResPlayer->getCurrentFrame() << endl;
@@ -452,7 +459,12 @@ void testApp::update(){
 		//		cout << "	set to percent " << 1.0*currentRenderFrame/hiResPlayer->getTotalNumFrames() << " actual percent " << hiResPlayer->getPosition() << endl;
 		////////
 		
-		updateRenderer(*hiResPlayer);		
+		if(hasHiresVideo){
+			updateRenderer(*hiResPlayer);		
+		}
+		else {
+			updateRenderer(*lowResPlayer);				
+		}
 	}
 	
 	if(!currentlyRendering){

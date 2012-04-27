@@ -20,6 +20,12 @@
 		37B50BC11530F1BD00D4158C /* opencv_ml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B50BB41530F1BD00D4158C /* opencv_ml.a */; };
 		37B50BC21530F1BD00D4158C /* opencv_objdetect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B50BB51530F1BD00D4158C /* opencv_objdetect.a */; };
 		37B50BC31530F1BD00D4158C /* opencv_video.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B50BB61530F1BD00D4158C /* opencv_video.a */; };
+		532BA0841549D14600864AB3 /* meshOcclude.vert in Sources */ = {isa = PBXBuildFile; fileRef = 532BA0831549D14600864AB3 /* meshOcclude.vert */; };
+		532BA0881549D15600864AB3 /* meshOcclude.frag in Sources */ = {isa = PBXBuildFile; fileRef = 532BA0871549D15600864AB3 /* meshOcclude.frag */; };
+		532BA0BF1549D66A00864AB3 /* dynamicLuminosity.vert in Resources */ = {isa = PBXBuildFile; fileRef = 532BA0BE1549D66A00864AB3 /* dynamicLuminosity.vert */; };
+		532BA0C41549D67A00864AB3 /* dynamicLuminosity.frag in Sources */ = {isa = PBXBuildFile; fileRef = 532BA0C31549D67A00864AB3 /* dynamicLuminosity.frag */; };
+		532F64D715474AE60072466D /* perlinluminosityblend.frag in Sources */ = {isa = PBXBuildFile; fileRef = 532F64D615474AE60072466D /* perlinluminosityblend.frag */; };
+		532F64DB15474AF50072466D /* perlinluminosityblend.vert in Sources */ = {isa = PBXBuildFile; fileRef = 532F64DA15474AF50072466D /* perlinluminosityblend.vert */; };
 		A6063F85148B1BCF00D154C3 /* ofxTextInputField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6063F83148B1BCF00D154C3 /* ofxTextInputField.cpp */; };
 		A60F74261477206A007E1206 /* Calibration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A60F73F81477206A007E1206 /* Calibration.cpp */; };
 		A60F74271477206A007E1206 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A60F73F91477206A007E1206 /* ContourFinder.cpp */; };
@@ -239,6 +245,12 @@
 		37B50BB41530F1BD00D4158C /* opencv_ml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = opencv_ml.a; sourceTree = "<group>"; };
 		37B50BB51530F1BD00D4158C /* opencv_objdetect.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = opencv_objdetect.a; sourceTree = "<group>"; };
 		37B50BB61530F1BD00D4158C /* opencv_video.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = opencv_video.a; sourceTree = "<group>"; };
+		532BA0831549D14600864AB3 /* meshOcclude.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = meshOcclude.vert; sourceTree = "<group>"; };
+		532BA0871549D15600864AB3 /* meshOcclude.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = meshOcclude.frag; sourceTree = "<group>"; };
+		532BA0BE1549D66A00864AB3 /* dynamicLuminosity.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = dynamicLuminosity.vert; sourceTree = "<group>"; };
+		532BA0C31549D67A00864AB3 /* dynamicLuminosity.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = dynamicLuminosity.frag; sourceTree = "<group>"; };
+		532F64D615474AE60072466D /* perlinluminosityblend.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = perlinluminosityblend.frag; sourceTree = "<group>"; };
+		532F64DA15474AF50072466D /* perlinluminosityblend.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = perlinluminosityblend.vert; sourceTree = "<group>"; };
 		A6063F83148B1BCF00D154C3 /* ofxTextInputField.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTextInputField.cpp; sourceTree = "<group>"; };
 		A6063F84148B1BCF00D154C3 /* ofxTextInputField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTextInputField.h; sourceTree = "<group>"; };
 		A60F73EF1477206A007E1206 /* Calibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Calibration.h; sourceTree = "<group>"; };
@@ -847,6 +859,12 @@
 		A69D77DC14E0E5A900963BF2 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
+				532BA0BE1549D66A00864AB3 /* dynamicLuminosity.vert */,
+				532BA0C31549D67A00864AB3 /* dynamicLuminosity.frag */,
+				532F64D615474AE60072466D /* perlinluminosityblend.frag */,
+				532F64DA15474AF50072466D /* perlinluminosityblend.vert */,
+				532BA0831549D14600864AB3 /* meshOcclude.vert */,
+				532BA0871549D15600864AB3 /* meshOcclude.frag */,
 				A67962F915329B8F000443D4 /* gaussian_blur.frag */,
 				A67962FA15329B8F000443D4 /* gaussian_blur.vert */,
 				A61A26B5153260AA004D9BFC /* alphafade.frag */,
@@ -1283,6 +1301,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E7EF805414DB5D6B007CD3CA /* RGBD.icns in Resources */,
+				532BA0BF1549D66A00864AB3 /* dynamicLuminosity.vert in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1386,6 +1405,11 @@
 				A61A26B8153260AA004D9BFC /* alphafade.vert in Sources */,
 				A67962FB15329B8F000443D4 /* gaussian_blur.frag in Sources */,
 				A67962FC15329B8F000443D4 /* gaussian_blur.vert in Sources */,
+				532F64D715474AE60072466D /* perlinluminosityblend.frag in Sources */,
+				532F64DB15474AF50072466D /* perlinluminosityblend.vert in Sources */,
+				532BA0841549D14600864AB3 /* meshOcclude.vert in Sources */,
+				532BA0881549D15600864AB3 /* meshOcclude.frag in Sources */,
+				532BA0C41549D67A00864AB3 /* dynamicLuminosity.frag in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

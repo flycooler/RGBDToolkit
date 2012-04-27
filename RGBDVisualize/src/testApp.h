@@ -188,5 +188,9 @@ class testApp : public ofBaseApp, public ofxMSAInteractiveObjectDelegate {
     ofShader DOFCloud;
     ofShader alphaFadeShader;
     ofShader gaussianBlur;
+	ofShader meshOccludeShader;
+	ofShader dynamicLuminosityShader;
+	
+	//ofShader perlinDensityShader;
     
 };

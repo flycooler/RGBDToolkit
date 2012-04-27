@@ -97,6 +97,18 @@ void testApp::setup(){
     gaussianBlur.begin();
     gaussianBlur.setUniform1i("self", 0);
     gaussianBlur.end();
+	
+	meshOccludeShader.load("shaders/meshOcclude");
+	
+	dynamicLuminosityShader.load("shaders/dynamicLuminosity");
+	dynamicLuminosityShader.begin();
+	dynamicLuminosityShader.setUniform1i("self",0);
+	dynamicLuminosityShader.end();
+	
+	/*perlinDensityShader.load("shaders/perlinluminosityblend");
+	perlinDensityShader.begin();
+	perlinDensityShader.setUniform1i("self",0);
+	perlinDensityShader.end();*/
 
 	newCompButton = new ofxMSAInteractiveObjectWithDelegate();
 	newCompButton->setLabel("New Comp");
@@ -225,6 +237,19 @@ void testApp::populateTimelineElements(){
 	timeline.addElement("Depth Sequence", &depthSequence);
 	timeline.addElement("Alignment", &alignmentScrubber);
     
+	timeline.addPage("Dynamic Luminosity", true);
+	timeline.addKeyframes("Black Fade", currentCompositionDirectory + "dlBlackFade.xml",ofRange(0.0,1.0));
+	timeline.addKeyframes("Luminosity Effect", currentCompositionDirectory + "dlLuminosityEffect.xml",ofRange(0.0,1.0));
+	timeline.addKeyframes("Luminosity Time Scale", currentCompositionDirectory + "dlTimeScale.xml", ofRange(-1.0,1.0));
+	timeline.addKeyframes("Luminosity Perlin Range", currentCompositionDirectory + "dlPerlinRange.xml", ofRange(0.0,1.0));
+	timeline.addKeyframes("Luminosity Perlin Amount", currentCompositionDirectory + "dlPerlinAmt.xml", ofRange(0.0,1.0));
+	timeline.addKeyframes("Luminosity Sine Period",currentCompositionDirectory+ "dlSinePeriod.xml", ofRange(0.01,10.0));
+	timeline.addKeyframes("Luminosity Sine Amount",currentCompositionDirectory+ "dlSineAmount.xml", ofRange(0.0,1.0));
+/*	timeline.addKeyrames("Red Fade", currentCompositionDirectory + "dlRedFade.xml",ofRange(0.0,1.0));
+	timeline.addKeyframes("Blue Fade", currentCompositionDirectory + "dlBlueFade.xml",ofRange(0.0,1.0));
+	timeline.addKeyframes("Green Fade", currentCompositionDirectory + "dlGreenFade.xml",ofRange(0.0,1.0));*/
+
+	
 	timeline.setCurrentPage("Rendering");
 	
 	playerElementAdded = true;
@@ -285,7 +310,11 @@ void testApp::processGeometry(){
 //    float explode = timeline.getKeyframeValue("Explode");
     float contract = 0; //timeline.getKeyframeValue("Contract");
     float explode = 0; //timeline.getKeyframeValue("Explode");
-    
+    float blackFade = timeline.getKeyframeValue("Black Fade");
+	/*float redFade = timeline.getKeyframeValue("Red Fade");
+	float blueFade = timeline.getKeyframeValue("Blue Fade");
+	float greenFade = timeline.getKeyframeValue("Green Fade");*/
+	
     ofVec3f center(0,0,0);
     for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
         center += renderer.getMesh().getVertex(i);
@@ -304,11 +333,15 @@ void testApp::processGeometry(){
         if(explode != 0){
             vert += (vert - center).normalize() * explode;
         }
+		renderer.getMesh().setColor(i,ofFloatColor(blackFade));
+		//renderer.getMesh().setColor(i,ofFloatColor(ofSignedNoise(renderer.getMesh().getColor(i).r,renderer.getMesh().getColor(i).g,renderer.getMesh().getColor(i).b)));
+		
     }
     
 //	for(int i = 0; i < renderer.getMesh().getVertices().size(); i++){
 //		renderer.getMesh().getVertices()[i].z += sin(i/30.0 + timeline.getCurrentFrame())*25;
 //	}
+	
 	
 }
 
@@ -388,7 +421,10 @@ void testApp::drawGeometry(){
         cam.begin(renderFboRect);
         
         ofPushStyle();
+		//perlinDensityShader.begin();
+		//perlinDensityShader.setUniform1f("time",(float)timeline.getCurrentFrame());
 		renderer.drawMesh();
+		//perlinDensityShader.end();
 		ofPopStyle();
         
         cam.end();
@@ -421,7 +457,12 @@ void testApp::drawGeometry(){
         ofEnableAlphaBlending();
         ofSetColor(0, 0, 0, 0);
         ofTranslate(camTranslateVec);
+		meshOccludeShader.begin();
+		//vector<ofFloatColor> meshColors = renderer.getMesh().getColors();
+		//renderer.getMesh().clearColors();
         renderer.drawMesh();
+		meshOccludeShader.end();
+		//renderer.getMesh().addColors(meshColors);
         ofPopMatrix();
 
         
@@ -435,8 +476,15 @@ void testApp::drawGeometry(){
         
 		ofSetColor(255);        
         ofSetLineWidth(timeline.getKeyframeValue("Wireframe Thickness"));
+		dynamicLuminosityShader.begin();
+		dynamicLuminosityShader.setUniform1f("luminosityEffect",timeline.getKeyframeValue("Luminosity Effect"));
+		dynamicLuminosityShader.setUniform1f("time",(float)timeline.getCurrentFrame()*timeline.getKeyframeValue("Luminosity Time Scale"));
+		dynamicLuminosityShader.setUniform1f("rangescale",timeline.getKeyframeValue("Luminosity Perlin Range"));
+		dynamicLuminosityShader.setUniform1f("perlinAmount", timeline.getKeyframeValue("Luminosity Perlin Amount"));
+		dynamicLuminosityShader.setUniform1f("sinePeriod",timeline.getKeyframeValue("Luminosity Sine Period"));
+		dynamicLuminosityShader.setUniform1f("sineAmount",timeline.getKeyframeValue("Luminosity Sine Amount"));
 		renderer.drawWireFrame();
-        
+		dynamicLuminosityShader.end();
 		ofPopStyle();      
         cam.end();
         
@@ -535,7 +583,9 @@ void testApp::drawGeometry(){
             ofEnableAlphaBlending();
             ofSetColor(0, 0, 0, 0);
             ofTranslate(camTranslateVec);
+			meshOccludeShader.begin();
             renderer.drawMesh();
+			meshOccludeShader.end();
             ofPopMatrix();
             
             ofSetColor(255);
@@ -545,7 +595,10 @@ void testApp::drawGeometry(){
             glEnable(GL_BLEND);
             //glBlendFunc(GL_ZERO, GL_ONE);
             glPointSize(timeline.getKeyframeValue("Point Size"));
+			//perlinDensityShader.begin();
+			//perlinDensityShader.setUniform1f("time",(float)timeline.getCurrentFrame()*.01f);
             renderer.drawPointCloud();
+		//	perlinDensityShader.end();
             ofPopStyle();
             
             cam.end();
@@ -558,7 +611,20 @@ void testApp::drawGeometry(){
             ofPushStyle();
             ofEnableAlphaBlending();
             ofSetColor(255, 255, 255, pointAlpha*255);
-            swapFbo.getTextureReference().draw(renderFboRect);
+			/*perlinDensityShader.begin();
+			perlinDensityShader.setUniformTexture("self",swapFbo.getTextureReference(),0);
+			glBegin(GL_QUADS);
+			glVertex2f(renderFboRect.x,renderFboRect.y);
+			glMultiTexCoord2f(0,0.0,0.0);
+			glVertex2f(renderFboRect.x+renderFboRect.width,renderFboRect.y);
+			glMultiTexCoord2f(0,1.0,0.0);
+			glVertex2f(renderFboRect.x+renderFboRect.width,renderFboRect.y+renderFboRect.height);
+			glMultiTexCoord2f(0,1.0,1.0);
+			glVertex2f(renderFboRect.x,renderFboRect.y+renderFboRect.height);
+			glMultiTexCoord2f(0,0.0,1.0);
+			glEnd();
+			perlinDensityShader.end();*/
+			swapFbo.getTextureReference().draw(renderFboRect);
             ofPopStyle();
             
             fbo.end();

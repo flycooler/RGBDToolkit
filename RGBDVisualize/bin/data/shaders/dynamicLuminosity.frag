@@ -1,7 +1,7 @@
 #version 110
 #extension GL_ARB_texture_rectangle : enable
 
-uniform sampler2DRect self;
+uniform sampler2DRect tex;
 uniform float luminosityEffect;
 uniform float time;
 uniform float rangescale;
@@ -158,7 +158,8 @@ void main(void)
 	n += 0.03125 * cnoise(uv * 32.0 - vec2( 0.0, time*5.6)); 
 	n = n*perlinAmount+(1.0-perlinAmount);
 	float s = ((sin(gl_TexCoord[0].s * sinePeriod + time)*sineAmount)+1.0)/2.0 + (1.0-sineAmount);
-	vec4 sample = texture2DRect(self, gl_TexCoord[0].st);
-	gl_FragColor.rgb = mix(sample.rgb*gl_Color.rgb,vec3(1.0),s*n*luminosityEffect*gl_Color.r);
+	vec4 sample = texture2DRect(tex, gl_TexCoord[0].st);
+	//gl_FragColor.rgb = mix(sample.rgb*gl_Color.rgb,vec3(1.0),s*n*luminosityEffect*gl_Color.r);
+	gl_FragColor.rgb = vec3(1.0,1.0,1.0);
 	gl_FragColor.a = 1.0;
 }

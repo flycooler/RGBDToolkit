@@ -5,7 +5,7 @@
 #include "ofxMSAInteractiveObjectDelegate.h"
 #include "ofxCvCheckerboardPreview.h"
 #include "ofxTimeline.h"
-//#include "ofxTLDepthImageSequence.h"
+#include "ofxTLDepthImageSequence.h"
 #include "ofxGameCamera.h"
 #include "ofxRGBDAlignment.h"
 #include "ofxDepthImageProvider.h"

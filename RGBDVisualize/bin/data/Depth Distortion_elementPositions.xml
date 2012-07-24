@@ -1,0 +1,26 @@
+<positions>
+    <element name="Noise">
+        <x>0</x>
+        <y>608</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Sine Amplitude">
+        <x>0</x>
+        <y>688</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Sine Frequency">
+        <x>0</x>
+        <y>768</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Sine Speed">
+        <x>0</x>
+        <y>848</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+</positions>

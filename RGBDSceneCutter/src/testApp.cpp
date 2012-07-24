@@ -227,7 +227,7 @@ void testApp::exportSequence(){
     videoPlayerRef.update();
     
 	firstFrame.setFromPixels(videoPlayerRef.getPixelsRef());
-	long depthTimeMillis = player.getVideoDepthAligment().getDepthFrameForVideoFrame(1000*videoPlayerRef()*)
+	long depthTimeMillis = player.getVideoDepthAligment().getDepthFrameForVideoFrame(1000*videoPlayerRef());
     //copy depth data across with new timing information
     
 //    int depthStartFrame = player.videoDepthAligment

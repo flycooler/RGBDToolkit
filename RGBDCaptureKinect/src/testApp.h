@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxRGBDCaptureGui.h"
-
+#include "ofxDepthImageProviderFreenect.h"
 
 class testApp : public ofBaseApp {
 

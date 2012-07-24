@@ -1,0 +1,32 @@
+<positions>
+    <element name="Mesh Alpha">
+        <x>0</x>
+        <y>928</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Point Alpha">
+        <x>0</x>
+        <y>608</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Point Size">
+        <x>0</x>
+        <y>688</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Wireframe Alpha">
+        <x>0</x>
+        <y>768</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Wireframe Thickness">
+        <x>0</x>
+        <y>848</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+</positions>

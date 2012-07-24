@@ -100,13 +100,12 @@ obj/x86_64Release/src/main.o: src/main.cpp \
  ../../../libs/openFrameworks/sound/ofPASoundStream.h \
  ../../../libs/openFrameworks/sound/ofSoundPlayer.h \
  ../../../libs/openFrameworks/sound/ofBaseSoundPlayer.h \
- ../../../libs/openFrameworks/sound/ofFmodSoundPlayer.h \
- ../../../libs/fmodex/include/fmod.h \
- ../../../libs/fmodex/include/fmod_codec.h \
- ../../../libs/fmodex/include/fmod_dsp.h \
- ../../../libs/fmodex/include/fmod_memoryinfo.h \
- ../../../libs/fmodex/include/fmod_errors.h \
- ../../../libs/fmodex/include/fmod.h \
+ ../../../libs/openFrameworks/sound/ofOpenALSoundPlayer.h \
+ ../../../addons/ofxTimeline/libs/sndfile/linux/include/AL/al.h \
+ ../../../addons/ofxTimeline/libs/sndfile/linux/include/AL/alc.h \
+ ../../../libs/kiss/include/kiss_fft.h \
+ ../../../libs/kiss/include/kiss_fftr.h \
+ ../../../libs/kiss/include/kiss_fft.h \
  ../../../libs/openFrameworks/video/ofVideoGrabber.h \
  ../../../libs/openFrameworks/video/ofGstVideoGrabber.h \
  ../../../libs/openFrameworks/video/ofGstUtils.h \
@@ -311,7 +310,7 @@ obj/x86_64Release/src/main.o: src/main.cpp \
  ../../../addons/ofxTimeline/src/ofxTLVideoPlayer.h \
  ../../../addons/ofxTimeline/src/ofxTLVideoThumb.h \
  ../../../addons/ofxTimeline/src/ofxTLColors.h \
- ../../../addons/ofxRGBDepth/couples/ofxTimeline/ofxTLDepthImageSequence.h \
+ ../../../addons/ofxRGBDepth/src/ofxTLDepthImageSequence.h \
  ../../../addons/ofxRGBDepth/src/ofxDepthImageCompressor.h \
  ../../../addons/ofxRGBDepth/src/ofxDepthImageProvider.h \
  ../../../addons/ofxRGBDepth/src/ofxDepthImageRecorder.h \
@@ -352,6 +351,12 @@ obj/x86_64Release/src/main.o: src/main.cpp \
  ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/RunningBackground.h \
  ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Flow.h \
  ../../../addons/ofxRGBDepth/src/ofxRGBDAlignment.h \
+ ../../../addons/ofxRGBDepth/src/ofxDepthImageProviderFreenect.h \
+ ../../../addons/ofxKinect/src/ofxKinect.h \
+ ../../../addons/ofxKinect/libs/libfreenect/libfreenect.h \
+ ../../../addons/ofxKinect/libs/libusb/osx/include/libusb-1.0/libusb.h \
+ ../../../addons/ofxKinect/src/ofxBase3DVideo.h \
+ ../../../addons/ofxKinect/libs/libusb/osx/include/libusb-1.0/libusb.h \
  ../../../libs/openFrameworks/app/ofAppGlutWindow.h \
  ../../../libs/openFrameworks/app/ofAppBaseWindow.h
 
@@ -563,19 +568,17 @@ obj/x86_64Release/src/main.o: src/main.cpp \
 
 ../../../libs/openFrameworks/sound/ofBaseSoundPlayer.h:
 
-../../../libs/openFrameworks/sound/ofFmodSoundPlayer.h:
+../../../libs/openFrameworks/sound/ofOpenALSoundPlayer.h:
 
-../../../libs/fmodex/include/fmod.h:
+../../../addons/ofxTimeline/libs/sndfile/linux/include/AL/al.h:
 
-../../../libs/fmodex/include/fmod_codec.h:
+../../../addons/ofxTimeline/libs/sndfile/linux/include/AL/alc.h:
 
-../../../libs/fmodex/include/fmod_dsp.h:
+../../../libs/kiss/include/kiss_fft.h:
 
-../../../libs/fmodex/include/fmod_memoryinfo.h:
+../../../libs/kiss/include/kiss_fftr.h:
 
-../../../libs/fmodex/include/fmod_errors.h:
-
-../../../libs/fmodex/include/fmod.h:
+../../../libs/kiss/include/kiss_fft.h:
 
 ../../../libs/openFrameworks/video/ofVideoGrabber.h:
 
@@ -1019,7 +1022,7 @@ src/testApp.h:
 
 ../../../addons/ofxTimeline/src/ofxTLColors.h:
 
-../../../addons/ofxRGBDepth/couples/ofxTimeline/ofxTLDepthImageSequence.h:
+../../../addons/ofxRGBDepth/src/ofxTLDepthImageSequence.h:
 
 ../../../addons/ofxRGBDepth/src/ofxDepthImageCompressor.h:
 
@@ -1100,6 +1103,18 @@ src/testApp.h:
 ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Flow.h:
 
 ../../../addons/ofxRGBDepth/src/ofxRGBDAlignment.h:
+
+../../../addons/ofxRGBDepth/src/ofxDepthImageProviderFreenect.h:
+
+../../../addons/ofxKinect/src/ofxKinect.h:
+
+../../../addons/ofxKinect/libs/libfreenect/libfreenect.h:
+
+../../../addons/ofxKinect/libs/libusb/osx/include/libusb-1.0/libusb.h:
+
+../../../addons/ofxKinect/src/ofxBase3DVideo.h:
+
+../../../addons/ofxKinect/libs/libusb/osx/include/libusb-1.0/libusb.h:
 
 ../../../libs/openFrameworks/app/ofAppGlutWindow.h:
 

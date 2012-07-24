@@ -1,0 +1,32 @@
+<positions>
+    <element name="Simplify">
+        <x>0</x>
+        <y>608</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="X Rotate">
+        <x>0</x>
+        <y>768</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Y Rotate">
+        <x>0</x>
+        <y>848</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Z Rotate">
+        <x>0</x>
+        <y>928</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+    <element name="Z Threshold">
+        <x>0</x>
+        <y>688</y>
+        <width>1024</width>
+        <height>50</height>
+    </element>
+</positions>

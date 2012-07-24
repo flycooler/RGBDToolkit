@@ -10,7 +10,7 @@ OF_ROOT = ../../..
 # for example search paths like:
 # USER_CFLAGS = -I src/objects
 
-USER_CFLAGS = -I$(OF_ROOT)/addons/ofxRGBDepth/couples/ofxTimeline/ -I$(OF_ROOT)/addons/ofxRGBDepth/couples/ofxKinect/
+#USER_CFLAGS = -I../../../addons/ofxRGBDepth/src -I../../../addons/ofxRGBDepth/gui -I../../../addons/ofxRGBDepth/couples/ofxTimeline -I../../../addons/ofxRGBDepth/couples/ofxKinect
 
 # -I$(OF_ROOT)/addons/ofxRGBDepth/couples/ofxOpenNI/
 # USER_LDFLAGS allows to pass custom flags to the linker

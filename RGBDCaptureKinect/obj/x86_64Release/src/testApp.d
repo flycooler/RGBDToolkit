@@ -310,7 +310,7 @@ obj/x86_64Release/src/testApp.o: src/testApp.cpp src/testApp.h \
  ../../../addons/ofxTimeline/src/ofxTLVideoPlayer.h \
  ../../../addons/ofxTimeline/src/ofxTLVideoThumb.h \
  ../../../addons/ofxTimeline/src/ofxTLColors.h \
- ../../../addons/ofxRGBDepth/couples/ofxTimeline/ofxTLDepthImageSequence.h \
+ ../../../addons/ofxRGBDepth/src/ofxTLDepthImageSequence.h \
  ../../../addons/ofxRGBDepth/src/ofxDepthImageCompressor.h \
  ../../../addons/ofxRGBDepth/src/ofxDepthImageProvider.h \
  ../../../addons/ofxRGBDepth/src/ofxDepthImageRecorder.h \
@@ -351,7 +351,7 @@ obj/x86_64Release/src/testApp.o: src/testApp.cpp src/testApp.h \
  ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/RunningBackground.h \
  ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Flow.h \
  ../../../addons/ofxRGBDepth/src/ofxRGBDAlignment.h \
- ../../../addons/ofxRGBDepth/couples/ofxKinect/ofxDepthImageProviderFreenect.h \
+ ../../../addons/ofxRGBDepth/src/ofxDepthImageProviderFreenect.h \
  ../../../addons/ofxKinect/src/ofxKinect.h \
  ../../../addons/ofxKinect/libs/libfreenect/libfreenect.h \
  ../../../addons/ofxKinect/libs/libusb/osx/include/libusb-1.0/libusb.h \
@@ -1020,7 +1020,7 @@ src/testApp.h:
 
 ../../../addons/ofxTimeline/src/ofxTLColors.h:
 
-../../../addons/ofxRGBDepth/couples/ofxTimeline/ofxTLDepthImageSequence.h:
+../../../addons/ofxRGBDepth/src/ofxTLDepthImageSequence.h:
 
 ../../../addons/ofxRGBDepth/src/ofxDepthImageCompressor.h:
 
@@ -1102,7 +1102,7 @@ src/testApp.h:
 
 ../../../addons/ofxRGBDepth/src/ofxRGBDAlignment.h:
 
-../../../addons/ofxRGBDepth/couples/ofxKinect/ofxDepthImageProviderFreenect.h:
+../../../addons/ofxRGBDepth/src/ofxDepthImageProviderFreenect.h:
 
 ../../../addons/ofxKinect/src/ofxKinect.h:
 
